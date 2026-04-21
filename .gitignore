@@ -1,0 +1,82 @@
+# ----------------------
+# Node / General
+# ----------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# ----------------------
+# Vite / React
+# ----------------------
+dist/
+.vite/
+.cache/
+
+# Build output
+build/
+
+# TypeScript
+*.tsbuildinfo
+
+# ----------------------
+# Electron
+# ----------------------
+electron/dist/
+electron/build/
+electron/release/
+
+# Electron builder artifacts
+*.AppImage
+*.deb
+*.rpm
+*.snap
+*.exe
+*.dmg
+*.zip
+
+# Native build
+electron/node_modules/
+**/node_modules/
+
+# ----------------------
+# SQLite / Runtime Data
+# ----------------------
+*.sqlite
+*.sqlite3
+*.db
+
+# Simulation outputs (important)
+simulations/
+*.xtc
+*.trr
+*.edr
+*.cpt
+*.log
+
+# ----------------------
+# IDE
+# ----------------------
+.vscode/
+.idea/
+
+# ----------------------
+# Misc
+# ----------------------
+coverage/
+.tmp/
+temp/

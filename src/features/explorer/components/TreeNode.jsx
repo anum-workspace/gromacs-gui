@@ -9,7 +9,7 @@ export default function TreeNode({ node }) {
     return (
         <div className="ml-2">
             <div
-                className="cursor-pointer hover:bg-gray-700 px-1 rounded"
+                className="cursor-pointer hover:bg-gray-700 px-1 rounded -mr-100"
                 onClick={() => isFolder && setOpen(!open)}
             >
                 {isFolder ? (open ? "📂" : "📁") : "📄"} {node.name}

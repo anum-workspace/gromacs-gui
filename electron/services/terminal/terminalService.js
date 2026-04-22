@@ -4,16 +4,18 @@ const pty = require("node-pty");
 let shell;
 let winRef;
 
-function startTerminal(win) {
-    if (shell) return; // prevent duplicate
-
+function startTerminal(win, cwd) {
+    if (shell) {
+        shell.kill(); // restart with new path
+    }
+    
     winRef = win;
 
     shell = pty.spawn("bash", [], {
         name: "xterm-color",
         cols: 80,
         rows: 30,
-        cwd: process.env.HOME,
+        cwd: cwd || process.env.HOME,
         env: process.env,
     });
 

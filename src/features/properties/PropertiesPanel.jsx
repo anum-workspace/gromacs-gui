@@ -1,20 +1,39 @@
 // features/properties/PropertiesPanel.jsx
-export default function PropertiesPanel() {
+import { useState, useEffect } from "react";
+
+export default function PropertiesPanel({ mdpPath }) {
+    const [nsteps, setNsteps] = useState("");
+    const [dt, setDt] = useState("");
+
+    useEffect(() => {
+        if (!mdpPath) return;
+
+        window.electron.invoke("mdp:read", mdpPath).then((data) => {
+            setNsteps(data.nsteps || "");
+            setDt(data.dt || "");
+        });
+    }, [mdpPath]);
+
+    const handleSave = async () => {
+        await window.electron.invoke("mdp:update", {
+            filePath: mdpPath,
+            updates: { nsteps, dt },
+        });
+    };
+
+    const totalNs = (nsteps * dt) / 1000;
+
     return (
-        <div className="p-3 text-sm">
-            <h2 className="font-semibold mb-2">Properties</h2>
+        <div className="p-2">
+            <label>nsteps</label>
+            <input value={nsteps} onChange={(e) => setNsteps(e.target.value)} />
 
-            <div className="space-y-2">
-                <div>
-                    <label>Temperature</label>
-                    <input className="w-full bg-gray-800 p-1 mt-1" />
-                </div>
+            <label>dt</label>
+            <input value={dt} onChange={(e) => setDt(e.target.value)} />
 
-                <div>
-                    <label>Pressure</label>
-                    <input className="w-full bg-gray-800 p-1 mt-1" />
-                </div>
-            </div>
+            <div>Total Time: {totalNs.toFixed(2)} ns</div>
+
+            <button onClick={handleSave}>Save</button>
         </div>
     );
 }

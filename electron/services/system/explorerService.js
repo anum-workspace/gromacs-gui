@@ -23,4 +23,24 @@ function readDirRecursive(dirPath) {
     };
 }
 
-module.exports = { readDirRecursive };
+function findGromacsFolder(rootPath) {
+    const baseName = path.basename(rootPath);
+
+    // Case 1: user opened gromacs directly
+    if (baseName.toLowerCase() === "gromacs") {
+        return rootPath;
+    }
+
+    // Case 2: search inside
+    const children = fs.readdirSync(rootPath);
+
+    for (const child of children) {
+        if (child.toLowerCase() === "gromacs") {
+            return path.join(rootPath, child);
+        }
+    }
+
+    return null;
+}
+
+module.exports = { readDirRecursive, findGromacsFolder };

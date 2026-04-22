@@ -3,10 +3,12 @@ import { useEffect, useRef } from "react";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 import "xterm/css/xterm.css";
+import { useExplorerStore } from "../explorer/store/explorerStore";
 
 export default function TerminalPanel() {
     const terminalRef = useRef(null);
     const xtermRef = useRef(null);
+    const gromacsPath = useExplorerStore((s) => s.gromacsPath);
 
     useEffect(() => {
         const term = new Terminal({
@@ -25,9 +27,6 @@ export default function TerminalPanel() {
 
         // store both
         xtermRef.current = { term, fitAddon };
-
-        // 🔥 Start backend terminal
-        window.electron.send("terminal:start");
 
         // Receive output
         const handleData = (data) => term.write(data);
@@ -68,9 +67,18 @@ export default function TerminalPanel() {
         };
     }, []);
 
+    // 🔥 Start terminal when project loads
+    useEffect(() => {
+        if (!gromacsPath) return;
+
+        window.electron.send("terminal:start", {
+            cwd: gromacsPath,
+        });
+    }, [gromacsPath]);
+
     return (
         <div className="h-full w-full overflow-hidden">
-            <div ref={terminalRef} className="h-full w-full" />
+            <div ref={terminalRef} className="h-full w-full scrollbar-dark" />
         </div>
     );
 }

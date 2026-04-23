@@ -3,7 +3,7 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const { createWindow } = require("./core/windowManager");
 const { createTray } = require("./core/systemTray");
 const { initIPC } = require("./ipc");
-const { initDB } = require("./services/database/db");
+const { initDB, closeDB } = require("./services/database/db");
 const { resumeSimulations } = require("./services/simulation/simulationManager");
 
 ipcMain.on("window:minimize", () => {
@@ -35,7 +35,7 @@ app.on("window-all-closed", (event) => {
 });
 
 app.on("before-quit", () => {
-    db.close();
+    closeDB();
 });
 
 app.on("activate", () => {

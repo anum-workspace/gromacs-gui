@@ -2,12 +2,13 @@
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
 const isDev = !app.isPackaged;
+const { getQuitting } = require("./appState");
 
 function createWindow() {
     const win = new BrowserWindow({
         width: 1200,
         height: 800,
-        icon: path.join(__dirname, "assets", "icon.png"),
+        icon: path.join(__dirname, "../assets/icon.png"),
         webPreferences: {
             contextIsolation: true,
             nodeIntegration: false,
@@ -25,7 +26,7 @@ function createWindow() {
     }
 
     win.on("close", (e) => {
-        if (!app.isQuiting) {
+        if (!getQuitting()) {
             e.preventDefault();
             win.hide();
         }

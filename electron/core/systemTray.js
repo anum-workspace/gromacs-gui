@@ -1,6 +1,7 @@
 const { Tray, Menu, app, dialog, BrowserWindow } = require("electron");
 const path = require("path");
-
+const { setQuitting } = require("./appState");
+const { closeDB } = require("../services/database/db");
 let tray = null;
 let simulationRunning = false;
 
@@ -18,8 +19,6 @@ function updateTrayMenu() {
     if (!tray) return;
 
     tray.setToolTip(simulationRunning ? "Gromacs GUI - Simulation Running" : "Gromacs GUI - Idle");
-
-    let isQuitting = false;
 
     const template = [
         {
@@ -117,11 +116,11 @@ function updateTrayMenu() {
                 }
 
                 // ✅ Mark real quitting (prevents window.hide())
-                isQuitting = true;
+                setQuitting(true); // 🔥 update shared state
 
                 // ✅ Close DB safely
                 try {
-                    db.close();
+                    closeDB();
                 } catch (err) {
                     console.error("DB close error:", err);
                 }

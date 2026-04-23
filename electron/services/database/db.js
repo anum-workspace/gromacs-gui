@@ -30,4 +30,17 @@ function getDB() {
     return db;
 }
 
-module.exports = { initDB, getDB };
+function closeDB() {
+    if (db) {
+        db.close((err) => {
+            if (err) {
+                console.error("Error closing DB:", err);
+            } else {
+                console.log("DB closed");
+            }
+        });
+        db = null;
+    }
+}
+
+module.exports = { initDB, getDB, closeDB };

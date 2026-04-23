@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useEditorStore } from "../../editor/store/editorStore.js";
 
 export default function TreeNode({
     node,
@@ -10,6 +11,7 @@ export default function TreeNode({
     loadChildren,
 }) {
     const [open, setOpen] = useState(false);
+    const openFile = useEditorStore((state) => state.openFile);
     const isFolder = node.type === "folder";
 
     const isActive = activePath === node.path;
@@ -23,6 +25,13 @@ export default function TreeNode({
         }
     };
 
+    const handleDoubleClick = async () => {
+        if (isFolder) return;
+
+        setActivePath(node.path);
+        await openFile(node.path);
+    };
+
     const children = node.children || [];
 
     return (
@@ -30,12 +39,13 @@ export default function TreeNode({
             {/* ROW */}
             <div
                 onClick={toggle}
+                onDoubleClick={handleDoubleClick}
                 onContextMenu={(e) => {
                     e.preventDefault();
-                    window.electron.ipcRenderer.send("ctx:open", node);
+                    window.electron.send("ctx:open", node);
                 }}
                 className={`flex items-center cursor-pointer px-1 rounded ${
-                    isActive ? "bg-blue-600 text-white" : "hover:bg-gray-700"
+                    isActive ? "bg-gray-800 text-gray-300" : "hover:bg-gray-700"
                 }`}
             >
                 {/* TREE LINES */}

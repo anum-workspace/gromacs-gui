@@ -5,6 +5,7 @@ const { createTray } = require("./core/systemTray");
 const { initIPC } = require("./ipc");
 const { initDB, closeDB } = require("./services/database/db");
 const { resumeSimulations } = require("./services/simulation/simulationManager");
+const { ensureAutoStart } = require("./services/system/autoStart");
 
 ipcMain.on("window:minimize", () => {
     BrowserWindow.getFocusedWindow()?.minimize();
@@ -22,6 +23,7 @@ ipcMain.on("window:close", () => {
 
 app.whenReady().then(async () => {
     await initDB();
+    await ensureAutoStart();
     initIPC();
     createWindow();
     createTray();

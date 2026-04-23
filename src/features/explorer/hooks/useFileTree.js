@@ -6,22 +6,50 @@ export function useFileTree(rootPath) {
     const [loading, setLoading] = useState(false);
 
     const loadRoot = async () => {
+        if (!rootPath) {
+            setTree([]);
+            return;
+        }
+
         setLoading(true);
-        const data = await fileSystemAPI.readDir(rootPath);
-        setTree(data);
-        setLoading(false);
+        try {
+            const data = await fileSystemAPI.readDir(rootPath);
+            setTree(data);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const loadChildren = async (node) => {
-        if (node.loaded) return node.children;
+        if (node.loaded || node.type !== "folder") return node.children ?? [];
 
         const children = await fileSystemAPI.readDir(node.path);
+        setTree((currentTree) =>
+            updateNode(currentTree, node.path, {
+                children,
+                loaded: true,
+            }),
+        );
 
-        node.children = children;
-        node.loaded = true;
-
-        setTree([...tree]);
+        return children;
     };
 
-    return { tree, loadRoot, loadChildren };
+    return { tree, loading, loadRoot, loadChildren };
+}
+
+function updateNode(nodes, targetPath, patch) {
+    return nodes.map((entry) => {
+        if (entry.path === targetPath) {
+            return { ...entry, ...patch };
+        }
+
+        if (entry.children?.length) {
+            return {
+                ...entry,
+                children: updateNode(entry.children, targetPath, patch),
+            };
+        }
+
+        return entry;
+    });
 }

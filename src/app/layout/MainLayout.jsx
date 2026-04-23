@@ -1,12 +1,40 @@
 // app/layout/MainLayout.jsx
 import Navbar from "../../features/navbar/Navbar.jsx";
-import ExplorerPanel from "../../features/explorer/ExplorerPanel.jsx";
+import ExplorerPanel from "../../features/explorer/components/ExplorerPanel.jsx";
 import TerminalPanel from "../../features/terminal/TerminalPanel.jsx";
 import PropertiesPanel from "../../features/properties/PropertiesPanel.jsx";
-import { Outlet } from "react-router-dom";
 import { Group, Panel, Separator } from "react-resizable-panels";
+import { useExplorerStore } from "../../features/explorer/store/explorerStore.js";
+import EditorTabs from "../../features/editor/components/EditorTabs.jsx";
+import CodeEditor from "../../features/editor/components/CodeEditor.jsx";
+import SimulationDashboard from "../../features/simulation/pages/SimulationDashboard.jsx";
+import { HOME_TAB_ID, useEditorStore } from "../../features/editor/store/editorStore.js";
+import { useEffect } from "react";
 
 export default function MainLayout() {
+    const { rootPath } = useExplorerStore();
+    const tabs = useEditorStore((state) => state.tabs);
+    const active = useEditorStore((state) => state.active);
+    const setActive = useEditorStore((state) => state.setActive);
+    const closeTab = useEditorStore((state) => state.closeTab);
+    const updateTabContent = useEditorStore((state) => state.updateTabContent);
+    const saveTab = useEditorStore((state) => state.saveTab);
+    const activeTab = tabs.find((tab) => tab.path === active);
+
+    useEffect(() => {
+        if (!activeTab?.dirty || activeTab.path === HOME_TAB_ID) {
+            return;
+        }
+
+        const timeoutId = window.setTimeout(() => {
+            void saveTab(activeTab.path);
+        }, 600);
+
+        return () => {
+            window.clearTimeout(timeoutId);
+        };
+    }, [activeTab?.content, activeTab?.dirty, activeTab?.path, saveTab]);
+
     return (
         <div className="h-screen flex flex-col bg-gray-900 text-white">
             {/* Navbar */}
@@ -19,8 +47,9 @@ export default function MainLayout() {
                 <Group className="h-full w-full" orientation="horizontal">
                     {/* Left Explorer */}
                     <Panel collapsible defaultSize="15%">
-                        <ExplorerPanel />
+                        <ExplorerPanel rootPath={rootPath} />
                     </Panel>
+
                     <Separator className="border-r border-gray-700" />
 
                     {/* Center */}
@@ -28,8 +57,29 @@ export default function MainLayout() {
                         <Group orientation="vertical">
                             {/* Main View */}
                             <Panel defaultSize="70%">
-                                <Outlet />
+                                <div className="flex h-full flex-col overflow-hidden">
+                                    <EditorTabs
+                                        tabs={tabs}
+                                        active={active}
+                                        setActive={setActive}
+                                        closeTab={closeTab}
+                                    />
+                                    <div className="min-h-0 flex-1 overflow-hidden">
+                                        {active === HOME_TAB_ID ? (
+                                            <SimulationDashboard />
+                                        ) : (
+                                            <CodeEditor
+                                                tab={activeTab}
+                                                onChange={(content) =>
+                                                    updateTabContent(active, content)
+                                                }
+                                                onSave={() => saveTab(active)}
+                                            />
+                                        )}
+                                    </div>
+                                </div>
                             </Panel>
+
                             <Separator className="border-b border-gray-700" />
 
                             {/* Terminal */}
@@ -40,6 +90,7 @@ export default function MainLayout() {
                             </Panel>
                         </Group>
                     </Panel>
+
                     <Separator className="border-r border-gray-700" />
 
                     {/* Right Properties */}

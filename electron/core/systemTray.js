@@ -51,14 +51,12 @@ function updateTrayMenu() {
                 });
 
                 if (result.response === 1) {
-                    const win = getMainWindow();
-                    if (win) {
-                        // 🔥 emit event instead of calling service directly
-                        win.webContents.send("tray:stopSimulation");
+                    try {
+                        const { stopSimulation } = require("../services/simulation/simulationManager");
+                        await stopSimulation();
+                    } catch (error) {
+                        console.error("Failed to stop simulation from tray:", error);
                     }
-
-                    simulationRunning = false;
-                    updateTrayMenu();
                 }
             },
         },
@@ -104,15 +102,6 @@ function updateTrayMenu() {
                     });
 
                     if (result.response !== 1) return;
-
-                    // 🔴 OPTIONAL: stop simulation safely
-                    try {
-                        if (simulationProcess) {
-                            simulationProcess.kill("SIGTERM"); // or SIGINT for graceful stop
-                        }
-                    } catch (err) {
-                        console.error("Failed to stop simulation:", err);
-                    }
                 }
 
                 // ✅ Mark real quitting (prevents window.hide())

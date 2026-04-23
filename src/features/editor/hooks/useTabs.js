@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { fileSystemAPI } from "../../../core/ipc/fileSystem.api";
+import { fileSystemAPI } from "../../../core/ipc/fileSystem.api.js";
 
 export function useTabs() {
     const [tabs, setTabs] = useState([]);
@@ -25,12 +25,13 @@ export function useTabs() {
     };
 
     const closeTab = (path) => {
-        setTabs((prev) => prev.filter((t) => t.path !== path));
-
-        if (active === path) {
-            const next = tabs.find((t) => t.path !== path);
-            setActive(next?.path || null);
-        }
+        setTabs((prev) => {
+            const nextTabs = prev.filter((t) => t.path !== path);
+            if (active === path) {
+                setActive(nextTabs[0]?.path || null);
+            }
+            return nextTabs;
+        });
     };
 
     return { tabs, active, openFile, closeTab, setActive };

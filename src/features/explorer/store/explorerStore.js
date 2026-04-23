@@ -8,8 +8,8 @@ export const useExplorerStore = create((set) => ({
 
   setProject: (data) =>
     set({
-      tree: data.tree,
-      rootPath: data.rootPath,
-      gromacsPath: data.gromacsPath,
+      tree: data.tree ?? null,
+      rootPath: data.rootPath ?? null,
+      gromacsPath: data.gromacsPath ?? null,
     }),
 }));

@@ -1,7 +1,5 @@
 // ipc/explorer.ipc.js
 const { ipcMain, dialog } = require("electron");
-const path = require("path");
-const { readDirRecursive } = require("../services/system/explorerService");
 const { findGromacsFolder } = require("../services/system/explorerService");
 const { validateGromacsProject } = require("../services/system/validateGromacsProject");
 
@@ -32,12 +30,9 @@ function registerExplorerIPC() {
             };
         }
 
-        const tree = readDirRecursive(rootPath);
-
         return {
             rootPath,
             gromacsPath,
-            tree,
         };
     });
 }

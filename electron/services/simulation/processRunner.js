@@ -2,7 +2,10 @@
 const { spawn } = require("child_process");
 
 function runProcess(command, args, cwd, onData) {
-    const proc = spawn(command, args, { cwd });
+    const proc = spawn(command, args, {
+        cwd,
+        env: process.env,
+    });
 
     proc.stdout.on("data", (data) => {
         onData(data.toString());

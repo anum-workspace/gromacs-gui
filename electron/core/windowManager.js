@@ -23,6 +23,13 @@ function createWindow() {
         win.setMenu(null);
         win.loadFile(path.join(__dirname, "dist", "index.html"));
     }
+
+    win.on("close", (e) => {
+        if (!app.isQuiting) {
+            e.preventDefault();
+            win.hide();
+        }
+    });
 }
 
 module.exports = { createWindow };

@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 
 const { createWindow } = require("./core/windowManager");
+const { createTray } = require("./core/systemTray");
 const { initIPC } = require("./ipc");
 const { initDB } = require("./services/database/db");
 const { resumeSimulations } = require("./services/simulation/simulationManager");
@@ -23,16 +24,18 @@ app.whenReady().then(async () => {
     await initDB();
     initIPC();
     createWindow();
+    createTray();
 
     // Resume simulations after restart
     await resumeSimulations();
 });
 
-app.on("window-all-closed", () => {
+app.on("window-all-closed", (event) => {
+    event.preventDefault(); // 🔥 Prevent app quit
+});
+
+app.on("before-quit", () => {
     db.close();
-    if (process.platform !== "darwin") {
-        app.quit();
-    }
 });
 
 app.on("activate", () => {
